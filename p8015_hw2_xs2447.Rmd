@@ -1,0 +1,57 @@
+---
+title: "p8105_hw2_xs2447"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+## Problem 1
+Load the Mr. Trash Wheel sheet
+```{r}
+mr_df = read_excel(
+  "data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+  sheet = "Mr. Trash Wheel",
+  range = "A2:N535"
+  ) %>%
+  janitor::clean_names() %>% 
+  drop_na()
+```
+
+Load the 2018 Precipitation sheet
+```{r}
+prcp_2018_df = read_excel(
+  "data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+  sheet = "2018 Precipitation",
+  range = "A2:B14"
+) %>% 
+  janitor::clean_names() %>% 
+  mutate(year = 2018)
+```
+
+Load the 2019 Precipitation sheet
+```{r}
+prcp_2019_df = read_excel(
+  "data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+  sheet = "2019 Precipitation",
+  range = "A2:B14"
+) %>% 
+  janitor::clean_names() %>% 
+  mutate(year = 2019)
+```
+
+Combine precipitation datasets
+```{r}
+prcp_df = 
+  bind_rows(prcp_2018_df,prcp_2019_df) %>% 
+  mutate(month = month.name[month])
+```
+
+The cleaned Mr.Trash Wheel dataset has 453 rows and 14 columns, including important variables such as dumspter number and sports balls. The cleaned 2018 Precipitation and 2019 Precipitation datasets each has 12 rows and 3 variables. Therefore, after combination, the precipitation dataset has 24 rows and 3 variables. The 3 variables are month in character, total precipitation in that month, and year number. The total precipitation in 2018 is `r sum(prcp_2018_df[,'total'])`. 
+
+```{r}
+sports_2019 = filter(mr_df, year == 2019)[,"sports_balls"]
+```
+The median number of sports balls in a dumpster in 2019 is `r apply(sports_2019, 2, median)`.
